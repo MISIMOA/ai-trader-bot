@@ -1,0 +1,72 @@
+import os
+import time
+from anthropic import Anthropic
+
+# Configuration
+ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY")
+client = Anthropic()
+
+def run_trading_bot():
+    """Bot de trading autonome 24/24"""
+    conversation_history = []
+    
+    system_prompt = """Tu es un bot de trading autonome qui utilise Claude pour décider des actions de trading.
+    - Analyser les conditions du marché (RSI, MACD, Bollinger Bands)
+    - Décider: BUY, SELL, ou HOLD
+    - Gerer le risque: stop-loss 5%, max $5 par trade
+    - Répondre en JSON: {"action": "BUY|SELL|HOLD", "reason": "...", "confidence": 0.0-1.0}
+    """
+    
+    print("🤖 AI Trading Bot 24/24 - DÉMARRÉ")
+    print("Appuie Ctrl+C pour arrêter\n")
+    
+    while True:
+        try:
+            # Simule données de marché
+            market_data = {
+                "price": 100 + (time.time() % 50),
+                "rsi": 55,
+                "macd": 0.5,
+                "timestamp": time.time()
+            }
+            
+            user_message = f"""
+            Données marché actuelles:
+            - Prix: ${market_data['price']:.2f}
+            - RSI: {market_data['rsi']}
+            - MACD: {market_data['macd']}
+            
+            Quelle action prendre?
+            """
+            
+            conversation_history.append({
+                "role": "user",
+                "content": user_message
+            })
+            
+            # Appel Claude API
+            response = client.messages.create(
+                model="claude-opus-4-6",
+                max_tokens=200,
+                system=system_prompt,
+                messages=conversation_history
+            )
+            
+            assistant_message = response.content[0].text
+            conversation_history.append({
+                "role": "assistant",
+                "content": assistant_message
+            })
+            
+            print(f"[{time.strftime('%H:%M:%S')}] Décision: {assistant_message}\n")
+            time.sleep(60)
+            
+        except KeyboardInterrupt:
+            print("\n✋ Bot arrêté")
+            break
+        except Exception as e:
+            print(f"❌ Erreur: {e}")
+            time.sleep(10)
+
+if __name__ == "__main__":
+    run_trading_bot()
