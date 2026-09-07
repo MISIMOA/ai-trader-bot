@@ -59,15 +59,13 @@ print()
 # Indicateurs simples
 def get_indicators():
     
-
-        if client:
-            print("\n🧠 Consulting Claude...")
-            try:
-                msg = f"RSI:{ind['rsi']} MACD:{ind['macd']} Volume:{ind['volume']} DXY:{ind['dxy']} - Decision BUY/SELL/HOLD?"
-                response = client.messages.create(
-                    model="claude-3-5-sonnet-20241022",
-                    max_tokens=100,
-                    messages=[{"role": "user", "content": msg}]
+response = client.messages.create(
+    model="claude-3-5-sonnet-20241022",
+    max_tokens=100,
+    messages=[{"role": "user", "content": msg}],
+    extra_headers={"anthropic-workspace-id": WORKSPACE_ID}
+)
+        
                 )
                 decision = response.content[0].text
                 print(f"✅ Claude: {decision[:50]}...")
