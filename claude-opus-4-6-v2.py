@@ -32,11 +32,15 @@ try:
 WORKSPACE_ID = os.getenv("ANTHROPIC_WORKSPACE_ID")
 
 if WORKSPACE_ID:
+    import httpx
+    http_client = httpx.Client(
+        headers={"anthropic-workspace-id": WORKSPACE_ID}
+    )
     client = Anthropic(
         api_key=API_KEY,
-        default_headers={"anthropic-workspace-id": WORKSPACE_ID}
+        httpx_client=http_client
     )
-    print("✅ Anthropic client created with workspace ID header")
+    print("✅ Anthropic client created with workspace ID via httpx")
 else:
     client = Anthropic(api_key=API_KEY)
     print("⚠️ Anthropic client created WITHOUT workspace ID")
