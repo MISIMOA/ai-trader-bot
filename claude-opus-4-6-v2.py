@@ -54,6 +54,7 @@ print()
 
 # Indicateurs simples
 def get_indicators():
+    print("🔵 GET_INDICATORS CALLED", flush=True)
     return {
         "rsi": round(random.uniform(20, 80), 2),
         "bb_lower": round(random.uniform(100, 110), 2),
