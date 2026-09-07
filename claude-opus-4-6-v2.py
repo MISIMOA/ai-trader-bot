@@ -27,18 +27,23 @@ try:
     from anthropic import Anthropic
     print("✅ Anthropic imported successfully")
     
-    if ORG_ID:
-        client = Anthropic(
-            api_key=API_KEY,
-            default_headers={"anthropic-workspace-id": ORG_ID}
-        )
-        print("✅ Anthropic client created with org ID header")
-    else:
-        client = Anthropic(api_key=API_KEY)
-        print("⚠️  Anthropic client created WITHOUT org ID")
+    # Récupérer les credentials Anthropic
+WORKSPACE_ID = os.getenv("ANTHROPIC_WORKSPACE_ID")
+
+if WORKSPACE_ID:
+    client = Anthropic(
+        api_key=API_KEY,
+        default_headers={"anthropic-workspace-id": WORKSPACE_ID}
+    )
+    print("✅ Anthropic client created with workspace ID header")
+else:
+    client = Anthropic(api_key=API_KEY)
+    print("⚠️ Anthropic client created WITHOUT workspace ID")
+    
 except Exception as e:
     print(f"❌ Error creating Anthropic client: {e}")
     client = None
+    
 
 print()
 print("=" * 80)
