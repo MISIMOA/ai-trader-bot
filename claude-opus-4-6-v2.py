@@ -9,7 +9,8 @@ import time
 import json
 import random
 from datetime import datetime
-
+import sys
+sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', buffering=1)
 print("=" * 80)
 print("🤖 TRADING BOT IA - ULTRA SIMPLE - DÉMARRAGE")
 print("=" * 80)
