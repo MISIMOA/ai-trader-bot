@@ -121,3 +121,19 @@ while True:
         print(f"\n❌ ERREUR: {e}")
         print("⏳ Retry dans 60 secondes...")
         time.sleep(60)
+
+# ===== BOUCLE PRINCIPALE =====
+if __name__ == "__main__":
+    print("\n" + "=" * 80)
+    print("🚀 RUNNING TRADING BOT")
+    print("=" * 80 + "\n")
+    
+    while True:
+        try:
+            get_indicators()
+        except KeyboardInterrupt:
+            print("\n\n🛑 BOT STOPPED")
+            break
+        except Exception as e:
+            print(f"❌ MAIN ERROR: {e}")
+            time.sleep(60)
