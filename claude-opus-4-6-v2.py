@@ -54,44 +54,8 @@ print()
 
 # Indicateurs simples
 def get_indicators():
-    print("🔵 GET_INDICATORS CALLED", flush=True)
-    return {
-        "rsi": round(random.uniform(20, 80), 2),
-        "bb_lower": round(random.uniform(100, 110), 2),
-        "bb_middle": round(random.uniform(110, 115), 2),
-        "bb_upper": round(random.uniform(115, 120), 2),
-        "macd": round(random.uniform(0, 5), 4),
-        "fvg": random.randint(0, 2),
-        "volume": round(random.uniform(0.8, 1.5), 2),
-        "support": round(random.uniform(110, 112), 2),
-        "resistance": round(random.uniform(116, 118), 2),
-        "dxy": "STRONG" if random.random() > 0.5 else "WEAK"
-    }
+    
 
-# Boucle principale
-iteration = 0
-while True:
-    try:
-        iteration += 1
-        print(f"\n{'='*80}")
-        print(f"🔄 CYCLE {iteration} - {datetime.now().isoformat()}")
-        print(f"{'='*80}")
-        
-        # Récupérer indicateurs
-        ind = get_indicators()
-        
-        # Afficher indicateurs
-        print("\n📊 INDICATEURS:")
-        print(f"  RSI: {ind['rsi']}")
-        print(f"  BB: [{ind['bb_lower']} | {ind['bb_middle']} | {ind['bb_upper']}]")
-        print(f"  MACD: {ind['macd']}")
-        print(f"  FVG: {ind['fvg']}")
-        print(f"  Volume: {ind['volume']}x")
-        print(f"  Support: {ind['support']}")
-        print(f"  Resistance: {ind['resistance']}")
-        print(f"  DXY: {ind['dxy']}")
-        
-        # Appel Claude si client ok
         if client:
             print("\n🧠 Consulting Claude...")
             try:
