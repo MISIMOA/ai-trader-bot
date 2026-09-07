@@ -30,7 +30,7 @@ try:
     
     # Récupérer les credentials Anthropic
 WORKSPACE_ID = os.getenv("ANTHROPIC_WORKSPACE_ID")
-
+print(f"🔍 WORKSPACE_ID: {WORKSPACE_ID}")
 if WORKSPACE_ID:
     import httpx
     http_client = httpx.Client(
