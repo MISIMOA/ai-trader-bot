@@ -1,120 +1,71 @@
 #!/usr/bin/env python3
 """
-AI Trading Bot avec Claude API
-Version avec logs de debugging pour Render
+🤖 TRADING BOT IA - HTTP DIRECT
+Pas d'import Anthropic SDK - requests seulement
 """
 
 import os
-import sys
-import time
+import requests
+import json
 
-# ============ DEBUGGING ============
-print("=" * 60)
-print("🤖 DÉMARRAGE DU BOT - DEBUG MODE")
-print("=" * 60)
-print(f"Python version: {sys.version}")
-print(f"Current directory: {os.getcwd()}")
-print(f"Environment variables: {list(os.environ.keys())}")
+API_KEY = os.getenv("ANTHROPIC_API_KEY")
+WORKSPACE_ID = os.getenv("ANTHROPIC_WORKSPACE_ID")
+MODEL = "claude-opus-4-6"
+API_URL = "https://api.anthropic.com/v1/messages"
 
-# ============ IMPORTS ============
-print("\n📦 Importing modules...")
-try:
-    from anthropic import Anthropic
-    print("✅ Anthropic imported successfully")
-except ImportError as e:
-    print(f"❌ ERROR importing Anthropic: {e}")
-    sys.exit(1)
-
-try:
-    import time
-    print("✅ time imported successfully")
-except ImportError as e:
-    print(f"❌ ERROR importing time: {e}")
-    sys.exit(1)
-
-# ============ CONFIG ============
-print("\n🔑 Checking API Key...")
-api_key = os.getenv("ANTHROPIC_API_KEY")
-if not api_key:
-    print("❌ ANTHROPIC_API_KEY not found in environment!")
-    print("Available env vars:", list(os.environ.keys()))
-    sys.exit(1)
-else:
-    print(f"✅ API Key found (length: {len(api_key)})")
-
-# ============ INITIALIZE CLIENT ============
-print("\n🌐 Initializing Anthropic client...")
-try:
-    client = Anthropic(api_key=api_key)
-    print("✅ Anthropic client initialized")
-except Exception as e:
-    print(f"❌ ERROR initializing client: {e}")
-    sys.exit(1)
-
-# ============ BOT LOGIC ============
-def run_trading_bot():
-    """Fonction principale du bot de trading"""
-    print("\n" + "=" * 60)
-    print("🚀 RUNNING TRADING BOT")
-    print("=" * 60)
+def call_claude(msg):
+    """Call Claude API directly via HTTP"""
+    if not API_KEY or not WORKSPACE_ID:
+        print("❌ ERREUR: API_KEY ou WORKSPACE_ID manquants")
+        return None
     
-    conversation_history = []
+    headers = {
+        "x-api-key": API_KEY,
+        "anthropic-version": "2023-06-01",
+        "anthropic-workspace-id": WORKSPACE_ID,
+        "content-type": "application/json"
+    }
+    
+    payload = {
+        "model": MODEL,
+        "max_tokens": 512,
+        "messages": [{"role": "user", "content": msg}]
+    }
     
     try:
-        print("\n💬 Starting conversation loop...")
+        print("📤 Appel API...")
+        response = requests.post(API_URL, json=payload, headers=headers, timeout=30)
         
-        # Premier message
-        user_message = "Bonjour! Peux-tu m'expliquer ta stratégie de trading?"
-        print(f"\n📤 User: {user_message}")
-        conversation_history.append({
-            "role": "user",
-            "content": user_message
-        })
-        
-        # Appel Claude API
-        print("\n🔄 Calling Claude API...")
-        try:
-            response = client.messages.create(
-                model="claude-3-5-sonnet-20241022",
-                max_tokens=200,
-                system="You are a trading assistant. Respond in French.",
-                messages=conversation_history
-            )
-            print("✅ API response received")
-        except Exception as e:
-            print(f"❌ ERROR calling API: {e}")
-            sys.exit(1)
-        
-        assistant_message = response.content[0].text
-        print(f"\n📥 Assistant: {assistant_message}")
-        conversation_history.append({
-            "role": "assistant",
-            "content": assistant_message
-        })
-        
-        print("\n✅ Bot loop completed successfully!")
-        
-    except KeyboardInterrupt:
-        print("\n🛑 Bot stopped by user")
-        return
+        if response.status_code == 200:
+            data = response.json()
+            return data['content'][0]['text']
+        else:
+            print(f"❌ Error {response.status_code}: {response.text}")
+            return None
     except Exception as e:
-        print(f"\n❌ ERROR in bot loop: {e}")
-        import traceback
-        traceback.print_exc()
-        sys.exit(1)
+        print(f"❌ ERREUR: {str(e)}")
+        return None
 
-# ============ MAIN ============
 if __name__ == "__main__":
-    print("\n" + "=" * 60)
-    print("🎯 MAIN ENTRY POINT")
+    print("=" * 60)
+    print("🚀 BOT TRADING IA - DÉMARRAGE")
     print("=" * 60)
     
-    try:
-        run_trading_bot()
-        print("\n✅ BOT COMPLETED SUCCESSFULLY")
-        print("=" * 60)
-    except Exception as e:
-        print(f"\n❌ FATAL ERROR: {e}")
-        import traceback
-        traceback.print_exc()
-        sys.exit(1)
+    print(f"✅ API Key présent: {bool(API_KEY)}")
+    print(f"✅ Workspace ID: {WORKSPACE_ID}")
+    print(f"✅ Modèle: {MODEL}")
+    
+    print("\n💬 Démarrage conversation...")
+    
+    test_msg = "Bonjour! Tu es mon bot trading. Explique moi brièvement ta stratégie."
+    print(f"\n📝 Message test: {test_msg}")
+    
+    response = call_claude(test_msg)
+    
+    if response:
+        print(f"\n✅ RÉPONSE REÇUE:\n{response}")
+        print("\n🎉 BOT OPÉRATIONNEL - HTTP DIRECT OK!")
+    else:
+        print("\n❌ Pas de réponse - Vérifier les logs Render")
+    
+    print("\n" + "=" * 60)
