@@ -69,4 +69,4 @@ if __name__ == "__main__":
         print("\n❌ Pas de réponse - Vérifier les logs Render")
     
     print("\n" + "=" * 60)
-Trigger rebuild
+
