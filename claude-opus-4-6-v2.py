@@ -1,106 +1,65 @@
-#!/usr/bin/env python3
-"""
-🤖 TRADING BOT IA - ULTRA SIMPLE VERSION
-No crash, simple logs, 7 indicators
-"""
-
 import os
-import time
 import json
-import random
-from datetime import datetime
-import sys
-sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', buffering=1)
-print("=" * 80)
-print("🤖 TRADING BOT IA - ULTRA SIMPLE - DÉMARRAGE")
-print("=" * 80)
+import requests
 
-# Config
-API_KEY = os.getenv("ANTHROPIC_API_KEY")
-ORG_ID = os.getenv("ANTHROPIC_ORG_ID")
-
-print(f"✅ API Key: {'présent' if API_KEY else 'MANQUANT'}")
-print(f"✅ Org ID: {'présent' if ORG_ID else 'MANQUANT'}")
-print()
-
-# Import Anthropic - avec gestion d'erreur
-try:
-    from anthropic import Anthropic
-    print("✅ Anthropic imported successfully")
+def call_claude_api(user_message):
+    """Call Claude API directly via HTTP"""
+    api_key = os.getenv("ANTHROPIC_API_KEY")
+    workspace_id = os.getenv("ANTHROPIC_WORKSPACE_ID")
     
-    # Récupérer les credentials Anthropic
-WORKSPACE_ID = os.getenv("ANTHROPIC_WORKSPACE_ID")
-print(f"🔍 WORKSPACE_ID: {WORKSPACE_ID}")
-if WORKSPACE_ID:
-    import httpx
-    http_client = httpx.Client(
-        headers={"anthropic-workspace-id": WORKSPACE_ID}
-    )
-    client = Anthropic(
-        api_key=API_KEY,
-        httpx_client=http_client
-    )
-    print("✅ Anthropic client created with workspace ID via httpx")
-else:
-    client = Anthropic(api_key=API_KEY)
-    print("⚠️ Anthropic client created WITHOUT workspace ID")
+    if not api_key:
+        print("❌ ERROR: ANTHROPIC_API_KEY not set")
+        return None
     
-except Exception as e:
-    print(f"❌ Error creating Anthropic client: {e}")
-    client = None
+    if not workspace_id:
+        print("❌ ERROR: ANTHROPIC_WORKSPACE_ID not set")
+        return None
     
-
-print()
-print("=" * 80)
-print("🚀 BOT ULTRA SIMPLE - PRÊT À TOURNER")
-print("=" * 80)
-print()
-
-# Indicateurs simples
-def get_indicators():
+    headers = {
+        "x-api-key": api_key,
+        "anthropic-version": "2023-06-01",
+        "anthropic-workspace-id": workspace_id,
+        "content-type": "application/json"
+    }
     
-response = client.messages.create(
-    model="claude-3-5-sonnet-20241022",
-    max_tokens=100,
-    messages=[{"role": "user", "content": msg}],
-    extra_headers={"anthropic-workspace-id": WORKSPACE_ID}
-)
+    payload = {
+        "model": "claude-opus-4-6",
+        "max_tokens": 1024,
+        "messages": [
+            {"role": "user", "content": user_message}
+        ]
+    }
+    
+    try:
+        response = requests.post(
+            "https://api.anthropic.com/v1/messages",
+            json=payload,
+            headers=headers,
+            timeout=30
+        )
         
-                )
-                decision = response.content[0].text
-                print(f"✅ Claude: {decision[:50]}...")
-            except Exception as e:
-                print(f"⚠️  Claude error: {str(e)[:80]}")
-                decision = "HOLD"
+        if response.status_code == 200:
+            data = response.json()
+            return data['content'][0]['text']
         else:
-            print("\n⚠️  Claude client not available - HOLD")
-            decision = "HOLD"
-        
-        print(f"\n✅ DECISION: {decision.split()[0] if decision else 'HOLD'}")
-        print(f"\n⏳ Prochain cycle dans 60 secondes...")
-        
-        time.sleep(60)
-        
-    except KeyboardInterrupt:
-        print("\n\n🛑 BOT STOPPED")
-        break
+            print(f"❌ API Error {response.status_code}: {response.text}")
+            return None
+            
     except Exception as e:
-        print(f"\n❌ ERREUR: {e}")
-        print("⏳ Retry dans 60 secondes...")
-        time.sleep(60)
+        print(f"❌ ERROR: {str(e)}")
+        return None
 
-# ===== BOUCLE PRINCIPALE =====
+# MAIN ENTRY POINT
 if __name__ == "__main__":
-    print("\n" + "=" * 80)
-    print("🚀 RUNNING TRADING BOT")
-    print("=" * 80 + "\n")
+    print("🤖 DÉMARRAGE DU BOT - HTTP MODE")
+    print(f"✅ API Key found: {len(os.getenv('ANTHROPIC_API_KEY', '')) > 0}")
+    print(f"✅ Workspace ID: {os.getenv('ANTHROPIC_WORKSPACE_ID')}")
     
-    while True:
-        try:
-            get_indicators()
-        except KeyboardInterrupt:
-            print("\n\n🛑 BOT STOPPED")
-            break
-        except Exception as e:
-            print(f"❌ MAIN ERROR: {e}")
-            time.sleep(60)
+    # Test
+    print("\n💬 Sending test message...")
+    response = call_claude_api("Bonjour! C'est un test du bot.")
+    
+    if response:
+        print(f"\n✅ Response: {response}")
+    else:
+        print("\n❌ No response received")
