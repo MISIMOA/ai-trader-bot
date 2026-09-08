@@ -25,5 +25,4 @@ try:
         print("❌ ERROR:", response.status_code, response.text)
 except Exception as e:
     print("❌ ERREUR:", str(e))
-requests>=2.31.0
-anthropic>=0.7.0
+
