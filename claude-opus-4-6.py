@@ -7,7 +7,7 @@ api_key = os.getenv("ANTHROPIC_API_KEY")
 headers = {
     "x-api-key": api_key,
     "anthropic-version": "2023-06-01",
-    Fix: remove invalid Anthropic-Workspace-ID header
+    # Correction: Retirer invalide Anthropique-Espace de travail-ID En-tête
     "content-type": "application/json"
 }
 
