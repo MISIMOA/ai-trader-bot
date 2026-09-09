@@ -7,7 +7,7 @@ workspace_id = os.getenv("ANTHROPIC_WORKSPACE_ID")
 headers = {
     "x-api-key": api_key,
     "anthropic-version": "2023-06-01",
-    "anthropic-workspace-id": workspace_id,
+    
     "content-type": "application/json"
 }
 
