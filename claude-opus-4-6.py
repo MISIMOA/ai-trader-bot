@@ -2,7 +2,7 @@
 import os, requests
 
 api_key = os.getenv("ANTHROPIC_API_KEY")
-workspace_id = os.getenv("ANTHROPIC_WORKSPACE_ID")
+
 
 headers = {
     "x-api-key": api_key,
